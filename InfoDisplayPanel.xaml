@@ -1,0 +1,52 @@
+<Window x:Class="RemoteTriviaCore.InfoDisplayPanel"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RemoteTriviaCore"
+        mc:Ignorable="d"
+        Title="Стан Рахунку" Height="480" Width="900" Background="#F6F6F6">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <!-- Верхня панель -->
+            <RowDefinition Height="*" />
+            <!-- Індикатори і результат -->
+        </Grid.RowDefinitions>
+
+        <!-- Верхній блок: назви, рахунок, таймер -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,16">
+            <UniformGrid Columns="4" DockPanel.Dock="Left">
+                <StackPanel HorizontalAlignment="Center">
+                    <Label x:Name="teamLabelOne" Content="Команда 1" FontSize="16" FontWeight="SemiBold" />
+                    <Label x:Name="scoreLabelTeamOne" Content="0" FontSize="36" FontWeight="Bold" />
+                </StackPanel>
+                <StackPanel HorizontalAlignment="Center">
+                    <Label x:Name="teamLabelTwo" Content="Команда 2" FontSize="16" FontWeight="SemiBold" />
+                    <Label x:Name="scoreLabelTeamTwo" Content="0" FontSize="36" FontWeight="Bold" />
+                </StackPanel>
+                <StackPanel HorizontalAlignment="Center">
+                    <Label x:Name="teamLabelThree" Content="Команда 3" FontSize="16" FontWeight="SemiBold" Visibility="Collapsed" />
+                    <Label x:Name="scoreLabelTeamThree" Content="0" FontSize="36" FontWeight="Bold" Visibility="Collapsed" />
+                </StackPanel>
+                <StackPanel HorizontalAlignment="Center">
+                    <Label x:Name="teamLabelFour" Content="Команда 4" FontSize="16" FontWeight="SemiBold" Visibility="Collapsed" />
+                    <Label x:Name="scoreLabelTeamFour" Content="0" FontSize="36" FontWeight="Bold" Visibility="Collapsed" />
+                </StackPanel>
+            </UniformGrid>
+            <StackPanel DockPanel.Dock="Right" Margin="32,0,0,0" HorizontalAlignment="Right">
+                <TextBlock Text="Номер питання" FontSize="14" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                <Label x:Name="questionIndexLabel" Content="1" FontSize="40" FontWeight="Bold" HorizontalAlignment="Center" />
+                <Label x:Name="countdownDisplay" Content="0" FontSize="36" Foreground="blue" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,8,0,0" />
+            </StackPanel>
+        </DockPanel>
+
+        <!-- Нижній блок: індикатори -->
+        <UniformGrid Grid.Row="1" Columns="4" HorizontalAlignment="Center" VerticalAlignment="Top" >
+            <Image x:Name="indicatorImageTeamOne" Height="96" Width="96" Source="lamp off.jpg" Stretch="Uniform" Margin="12" />
+            <Image x:Name="indicatorImageTeamTwo" Height="96" Width="96" Source="lamp off.jpg" Stretch="Uniform" Margin="12" />
+            <Image x:Name="indicatorImageTeamThree" Height="96" Width="96" Source="lamp off.jpg" Stretch="Uniform" Margin="12" Visibility="Collapsed" />
+            <Image x:Name="indicatorImageTeamFour" Height="96" Width="96" Source="lamp off.jpg" Stretch="Uniform" Margin="12" Visibility="Collapsed" />
+        </UniformGrid>
+    </Grid>
+</Window>
