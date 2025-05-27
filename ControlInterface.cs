@@ -16,10 +16,12 @@ namespace RemoteTriviaCore
 
         private readonly DispatcherTimer _mainTimer;
         private readonly DispatcherTimer _bonusTimer;
+        private readonly InfoDisplayPanel _infoDisplayPanel;
 
         private int _timeCounter;
         private int _questionIndex;
 
+        private int? _firstTeamPressed = null;  // ID команди, яка перша натиснула кнопку
 
         public ControlInterface()
         {
@@ -27,6 +29,7 @@ namespace RemoteTriviaCore
 
             _receiver = new NetworkHandlerUnit();
             _session = new RoundSessionCore(2); // тимчасово задано 2 команди
+            _infoDisplayPanel = new InfoDisplayPanel();
 
             _mainTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             _bonusTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
@@ -43,8 +46,8 @@ namespace RemoteTriviaCore
         private void InitInterface()
         {
             countdownDisplay.Content = "0";
-            questionDisplay.Content = "1";
-            _questionIndex = 1;
+            questionDisplay.Content = "0";
+            _questionIndex = 0;
         }
 
         private void MainTimer_Tick(object sender, EventArgs e)
@@ -60,6 +63,7 @@ namespace RemoteTriviaCore
             if (_timeCounter >= 60)
             {
                 _mainTimer.Stop();
+                startButton.IsEnabled = true;
             }
         }
 
@@ -79,6 +83,12 @@ namespace RemoteTriviaCore
         {
             Dispatcher.Invoke(() =>
             {
+                // Обробляємо повідомлення від команди
+                if (message.StartsWith("buttonPressed"))
+                {
+                    int teamId = int.Parse(message.Substring("buttonPressed".Length));
+                    HandleTeamButtonPress(teamId);  //Обробляємо натискання кнопки
+                }
                 switch (message)
                 {
                     case "start":
@@ -99,6 +109,8 @@ namespace RemoteTriviaCore
         private void StartRound()
         {
             _timeCounter = 0;
+            _questionIndex += 1;
+            questionDisplay.Content = _questionIndex;
             PlaySound("Sounds/Gong.mp3");
             _mainTimer.Start();
             startButton.IsEnabled = false;
@@ -116,17 +128,10 @@ namespace RemoteTriviaCore
         private void NewGame()
         {
             ResetGame();
-            string selected = teamCountSelector.Text;
+            int count = Int32.Parse(teamCountSelector.Text);
 
-            int count = selected switch
-            {
-                "Две" => 2,
-                "Три" => 3,
-                "Четыре" => 4,
-                _ => 2 // значення за замовчуванням
-            };
             CheckingCoutOfTeams(count);
-            _questionIndex = 1;
+            _questionIndex = 0;
             questionDisplay.Content = _questionIndex.ToString();
 
         }
@@ -192,6 +197,74 @@ namespace RemoteTriviaCore
                     teamLabels[i].Content = nameInputs[i].Text; // оновлюємо назву команди
                 }
             }
+        }
+
+        // Метод для оновлення індикаторів
+        private void UpdateIndicators(int teamId)
+        {
+            var indicators = new[] { indicatorImageTeamOne, indicatorImageTeamTwo, indicatorImageTeamThree, indicatorImageTeamFour };
+
+            // Спочатку вимикаємо всі індикатори
+            foreach (var indicator in indicators)
+            {
+                indicator.Source = new BitmapImage(new Uri("lamp off.jpg", UriKind.Relative));  // Індикатор вимкнений
+            }
+
+            // Включаємо індикатор для команди, яка натиснула кнопку першою
+            if (teamId >= 0 && teamId < indicators.Length)
+            {
+                indicators[teamId].Source = new BitmapImage(new Uri("lamp on.jpg", UriKind.Relative));  // Індикатор ввімкнений
+            }
+        }
+
+        // Метод для обробки натискання кнопок команд
+        private void HandleTeamButtonPress(int teamId)
+        {
+            if (_firstTeamPressed == null)
+            {
+                // Якщо перша команда ще не вибрана, встановлюємо її
+                _firstTeamPressed = teamId;
+
+                // Оновлюємо індикатори
+                UpdateIndicators(teamId);
+
+                // Показуємо ведучому, яка команда натиснула першою
+                MessageBox.Show($"Перша команда: {GetTeamNameById(teamId)}", "Перша команда", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        // Метод для отримання назви команди за ID
+        private string GetTeamNameById(int teamId)
+        {
+            switch (teamId)
+            {
+                case 0: return teamNameInputOne.Text;
+                case 1: return teamNameInputTwo.Text;
+                case 2: return teamNameInputThree.Text;
+                case 3: return teamNameInputFour.Text;
+                default: return "Невідома команда";
+            }
+        }
+
+        // Обробники подій для кнопок команд
+        private void TeamOneButton_Click(object sender, RoutedEventArgs e)
+        {
+            HandleTeamButtonPress(0);  // 0 - ID першої команди
+        }
+
+        private void TeamTwoButton_Click(object sender, RoutedEventArgs e)
+        {
+            HandleTeamButtonPress(1);  // 1 - ID другої команди
+        }
+
+        private void TeamThreeButton_Click(object sender, RoutedEventArgs e)
+        {
+            HandleTeamButtonPress(2);  // 2 - ID третьої команди
+        }
+
+        private void TeamFourButton_Click(object sender, RoutedEventArgs e)
+        {
+            HandleTeamButtonPress(3);  // 3 - ID четвертої команди
         }
 
 
