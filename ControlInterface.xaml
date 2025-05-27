@@ -26,7 +26,7 @@
         <DockPanel Grid.Row="0" Margin="0,0,0,12">
             <Label x:Name="countdownDisplay" Content="0" FontSize="60" Foreground="blue" FontWeight="Bold" DockPanel.Dock="Left" Margin="0,0,32,0" />
             <StackPanel Orientation="Vertical">
-                <TextBlock Text="Поточне питання" FontSize="14" FontWeight="SemiBold" />
+                <TextBlock Text="Поточне питання" FontSize="22" FontWeight="SemiBold" />
                 <Label x:Name="questionDisplay" Content="1" FontSize="40" FontWeight="Bold" />
             </StackPanel>
         </DockPanel>
@@ -34,19 +34,19 @@
         <!-- Блок: Назви команд та рахунок -->
         <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,12">
             <StackPanel HorizontalAlignment="Center">
-                <Label x:Name="teamLabelOne" Content="1-ша команда" FontSize="16" HorizontalContentAlignment="Center" />
+                <Label x:Name="teamLabelOne" Content="1-ша команда" FontSize="20" HorizontalContentAlignment="Center" />
                 <Label x:Name="scoreLabelTeamOne" Content="0" FontSize="24" FontWeight="Bold" HorizontalContentAlignment="Center" />
             </StackPanel>
             <StackPanel HorizontalAlignment="Center">
-                <Label x:Name="teamLabelTwo" Content="2-га команда" FontSize="16" HorizontalContentAlignment="Center" />
+                <Label x:Name="teamLabelTwo" Content="2-га команда" FontSize="20" HorizontalContentAlignment="Center" />
                 <Label x:Name="scoreLabelTeamTwo" Content="0" FontSize="24" FontWeight="Bold" HorizontalContentAlignment="Center" />
             </StackPanel>
             <StackPanel HorizontalAlignment="Center">
-                <Label x:Name="teamLabelThree" Content="3-тя команда" FontSize="16" HorizontalContentAlignment="Center" />
+                <Label x:Name="teamLabelThree" Content="3-тя команда" FontSize="20" HorizontalContentAlignment="Center" />
                 <Label x:Name="scoreLabelTeamThree" Content="0" FontSize="24" FontWeight="Bold" HorizontalContentAlignment="Center" />
             </StackPanel>
             <StackPanel HorizontalAlignment="Center">
-                <Label x:Name="teamLabelFour" Content="4-та команда" FontSize="16" HorizontalContentAlignment="Center" />
+                <Label x:Name="teamLabelFour" Content="4-та команда" FontSize="20" HorizontalContentAlignment="Center" />
                 <Label x:Name="scoreLabelTeamFour" Content="0" FontSize="24" FontWeight="Bold" HorizontalContentAlignment="Center" />
             </StackPanel>
         </UniformGrid>
@@ -62,36 +62,36 @@
         <!-- Блок: Ввід назв команд та вибір кількості -->
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,12">
             <StackPanel Margin="12">
-                <TextBlock Text="Кількість команд" FontSize="12" />
-                <ComboBox x:Name="teamCountSelector" Width="120" SelectedIndex="0">
+                <TextBlock Text="Кількість команд" FontSize="20" />
+                <ComboBox FontSize="16" x:Name="teamCountSelector" Width="152" SelectedIndex="0">
                     <ComboBoxItem Content="2" />
                     <ComboBoxItem Content="3" />
                     <ComboBoxItem Content="4" />
                 </ComboBox>
             </StackPanel>
             <StackPanel Margin="12">
-                <TextBlock x:Name="inputTeamLabelOne" Text="Назва 1" />
-                <TextBox x:Name="teamNameInputOne" Width="140" Text="Команда 1" />
+                <TextBlock FontSize="20" x:Name="inputTeamLabelOne" Text="Назва 1" />
+                <TextBox x:Name="teamNameInputOne" FontSize="16" Width="140" Text="Команда 1" />
             </StackPanel>
             <StackPanel Margin="12">
-                <TextBlock x:Name="inputTeamLabelTwo" Text="Назва 2" />
-                <TextBox x:Name="teamNameInputTwo" Width="140" Text="Команда 2" />
+                <TextBlock FontSize="20" x:Name="inputTeamLabelTwo" Text="Назва 2" />
+                <TextBox FontSize="16" x:Name="teamNameInputTwo" Width="140" Text="Команда 2" />
             </StackPanel>
             <StackPanel Margin="12">
-                <TextBlock x:Name="inputTeamLabelThree" Text="Назва 3" />
-                <TextBox x:Name="teamNameInputThree" Width="140" Text="Команда 3" />
+                <TextBlock FontSize="20" x:Name="inputTeamLabelThree" Text="Назва 3" />
+                <TextBox FontSize="16" x:Name="teamNameInputThree" Width="140" Text="Команда 3" />
             </StackPanel>
             <StackPanel Margin="12">
-                <TextBlock x:Name="inputTeamLabelFour" Text="Назва 4" />
-                <TextBox x:Name="teamNameInputFour" Width="140" Text="Команда 4" />
+                <TextBlock FontSize="20" x:Name="inputTeamLabelFour" Text="Назва 4" />
+                <TextBox FontSize="16" x:Name="teamNameInputFour" Width="140" Text="Команда 4" />
             </StackPanel>
         </StackPanel>
 
         <!-- Кнопки дій -->
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,8">
-            <Button x:Name="startButton" Content="▶ Старт" Width="160" Margin="12,0" Height="42" Click="StartRoundCommand" />
-            <Button x:Name="resetSessionButton" Content="⟲ Скинути" Width="160" Margin="12,0" Height="42" Click="ResetSessionTrigger" />
-            <Button x:Name="newGameButton" Content="⧉ Нова гра" Width="160" Margin="12,0" Height="42" Click="LaunchNewGameRoutine" />
+            <Button FontSize="20" x:Name="startButton" Content="▶ Старт" Width="160" Margin="12,0" Height="42" Click="StartRoundCommand" />
+            <Button FontSize="20" x:Name="resetSessionButton" Content="⟲ Скинути" Width="160" Margin="12,0" Height="42" Click="ResetSessionTrigger" />
+            <Button FontSize="20" x:Name="newGameButton" Content="⧉ Нова гра" Width="160" Margin="12,0" Height="42" Click="LaunchNewGameRoutine" />
         </StackPanel>
     </Grid>
 </Window>
