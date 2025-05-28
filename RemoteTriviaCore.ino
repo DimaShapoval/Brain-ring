@@ -1,18 +1,19 @@
-#include <ESP8266WiFi.h>
+#include <WiFi.h>
 #include <WiFiUdp.h>
+#include <cstring>  // Для strlen()
 
-#define NETWORK_SSID "ControlPoint"     // Назва точки доступу Wi-Fi
-#define NETWORK_PASS "pass123456"       // Пароль для точки доступу
+#define NETWORK_SSID "ControlPoint"
+#define NETWORK_PASS "pass123456"
 
-const uint16_t COMMUNICATION_PORT = 8080; // Порт для обміну повідомленнями через UDP
+const uint16_t COMMUNICATION_PORT = 9090;
 
-// Структура для опису кнопок команд
+// Опис кнопок команд
 struct ButtonUnit {
-  uint8_t pin;             // Пін, до якого підключено кнопку
-  const char* identifier;  // Ідентифікатор команди
+  uint8_t pin;             // GPIO-пін
+  const char* identifier;  // Ідентифікатор повідомлення
 };
 
-// Масив доступних кнопок команд
+// Налаштування пінів для 4-х кнопок
 ButtonUnit teamButtons[] = {
   {14, "unit_one"},
   {12, "unit_two"},
@@ -20,86 +21,71 @@ ButtonUnit teamButtons[] = {
   {15, "unit_four"}
 };
 
-const uint8_t ledIndicatorPin = 2; // Світлодіод для візуального контролю стану
+const uint8_t ledIndicatorPin = 2;             // Пін для LED-індикатора
+WiFiUDP messageInterface;                      // UDP-інтерфейс
+const IPAddress broadcastIP(192,168,4,255);     // Широкомовна адреса AP
 
-WiFiUDP messageInterface;                 // UDP-інтерфейс для надсилання повідомлень
-struct station_info* connectedStations;   // Інформація про підключені пристрої
-struct ip_addr* stationAddress;           // IP-адреса поточного пристрою
-
-// Ініціалізація Wi-Fi як точки доступу
+// Налаштовуємо ESP32 як Wi-Fi точку доступу
 void initializeNetwork() {
-  WiFi.disconnect(); // Вимикаємо будь-які попередні з'єднання
-  delay(500);
-  WiFi.softAP(NETWORK_SSID, NETWORK_PASS); // Створення точки доступу
+  WiFi.softAP(NETWORK_SSID, NETWORK_PASS);
+  delay(500);  // чекаємо підняття AP
 }
 
-// Налаштування режиму пінів кнопок та індикатора
+// Налаштовуємо піні: кнопки — як входи, LED — як вихід
 void configureInputs() {
-  for (auto& button : teamButtons) {
-    pinMode(button.pin, INPUT); // Усі кнопки — у режимі INPUT
+  for (auto& btn : teamButtons) {
+    pinMode(btn.pin, INPUT_PULLUP);
   }
-  pinMode(ledIndicatorPin, OUTPUT);        // Індикатор — вихід
-  digitalWrite(ledIndicatorPin, LOW);      // Початковий стан — вимкнений
+  pinMode(ledIndicatorPin, OUTPUT);
+  digitalWrite(ledIndicatorPin, LOW);
 }
 
-// Надсилання повідомлення UDP-клієнтам
+// Надсилаємо UDP-повідомлення на broadcast IP
 void dispatchSignal(const char* payload) {
-  connectedStations = wifi_softap_get_station_info(); // Отримання списку клієнтів
-
-  while (connectedStations != NULL) {
-    stationAddress = &connectedStations->ip;
-    IPAddress targetIP(stationAddress->addr);
-
-    // Надсилання повідомлення на IP кожного клієнта
-    messageInterface.beginPacket(targetIP, COMMUNICATION_PORT);
-    messageInterface.write(payload);
-    messageInterface.endPacket();
-
-    connectedStations = STAILQ_NEXT(connectedStations, next);
-  }
+  messageInterface.beginPacket(broadcastIP, COMMUNICATION_PORT);
+  messageInterface.write((const uint8_t*)payload, strlen(payload));
+  messageInterface.endPacket();
 }
 
-// Визначення, яка кнопка була натиснута
+// Пошук першої натиснутої кнопки
 int findPressedButton() {
-  for (int index = 0; index < sizeof(teamButtons) / sizeof(teamButtons[0]); ++index) {
-    if (digitalRead(teamButtons[index].pin) == HIGH) {
-      return index;
+  for (int i = 0; i < sizeof(teamButtons)/sizeof(teamButtons[0]); ++i) {
+    // При INPUT_PULLUP кнопка замикає на GND → читаємо LOW
+    if (digitalRead(teamButtons[i].pin) == LOW) {
+      return i;
     }
   }
-  return -1; // Якщо жодна кнопка не натиснута
+  return -1;
 }
 
-// Основна логіка опрацювання натискань із блокуванням повтору
+// Основний цикл: обробка натискань з дебаунсом
 void pollingCycle() {
   static unsigned long lastTransmission = 0;
-  static bool transmissionBlocked = false;
+  static bool blocked = false;
 
-  int pressedButtonIndex = findPressedButton();
+  int idx = findPressedButton();
+  if (idx != -1 && !blocked && (millis() - lastTransmission > 300)) {
+    // Відправляємо ідентифікатор команди
+    dispatchSignal(teamButtons[idx].identifier);
+    // Для індикації можна мигнути LED
+    digitalWrite(ledIndicatorPin, HIGH);
+    delay(50);
+    digitalWrite(ledIndicatorPin, LOW);
 
-  if (pressedButtonIndex != -1 && !transmissionBlocked && (millis() - lastTransmission > 300)) {
-    dispatchSignal(teamButtons[pressedButtonIndex].identifier); // Надсилання повідомлення
-    lastTransmission = millis();     // Запис часу останньої події
-    transmissionBlocked = true;      // Заборона повторного спрацювання
+    lastTransmission = millis();
+    blocked = true;
   }
-
-  if (pressedButtonIndex == -1) {
-    transmissionBlocked = false;     // Розблокування, коли кнопка відпущена
+  if (idx == -1) {
+    blocked = false;
   }
 }
 
-// Початкова ініціалізація системи
-void prepareEnvironment() {
-  Serial.begin(115200);       // Увімкнення серіального монітора
-  configureInputs();          // Налаштування пінів
-  initializeNetwork();        // Запуск точки доступу
-}
-
-// Вхідна точка програми Arduino
 void setup() {
-  prepareEnvironment();       // Підготовка до роботи
+  Serial.begin(115200);
+  configureInputs();
+  initializeNetwork();
 }
 
-// Основний цикл програми
 void loop() {
-  pollingCycle();             // Безперервне опитування стану кнопок
+  pollingCycle();
 }
