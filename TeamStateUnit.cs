@@ -7,6 +7,7 @@ namespace RemoteTriviaCore
     /// </summary>
     public class TeamStateUnit
     {
+        private readonly Func<DateTime> _utcNowProvider;
         /// <summary>
         /// Ідентифікатор команди.
         /// </summary>
@@ -26,10 +27,11 @@ namespace RemoteTriviaCore
         /// Створення нового стану команди.
         /// </summary>
         /// <param name="teamId">Унікальний номер команди.</param>
-        public TeamStateUnit(int teamId)
+        public TeamStateUnit(int teamId, Func<DateTime>? utcNow = null)
         {
             TeamId = teamId;
             IsActive = false;
+            _utcNowProvider = utcNow ?? (() => DateTime.UtcNow);
         }
 
         /// <summary>
@@ -51,6 +53,15 @@ namespace RemoteTriviaCore
         {
             IsActive = false;
             ActivationTime = null;
+        }
+
+        public void RegisterPress()
+        {
+            if (!IsActive)
+            {
+                IsActive = true;
+                ActivationTime = _utcNowProvider();
+            }
         }
     }
 }

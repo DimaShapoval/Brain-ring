@@ -35,14 +35,17 @@ namespace RemoteTriviaCore
     public class RoundSessionCore
     {
         private readonly Dictionary<int, TeamState> _teams;
+        private readonly Dictionary<int, int> _scores;
         private bool _active;
 
         public RoundSessionCore(int teamCount)
         {
             _teams = new Dictionary<int, TeamState>();
+            _scores = new Dictionary<int, int>();
             for (int i = 1; i <= teamCount; i++)
             {
                 _teams[i] = new TeamState(i);
+                _scores[i] = 0;
             }
             _active = true;
         }
@@ -93,5 +96,18 @@ namespace RemoteTriviaCore
         }
 
         public IReadOnlyDictionary<int, TeamState> GetTeamStates() => _teams;
+
+        /// <summary>Додає одному балу команді з даним ID.</summary>
+        public void AwardPoint(int teamId)
+        {
+            if (_scores.ContainsKey(teamId))
+                _scores[teamId]++;
+        }
+
+        /// <summary>Повертає поточний рахунок команди (0, якщо такої нема).</summary>
+        public int GetTeamScore(int teamId)
+        {
+            return _scores.TryGetValue(teamId, out var s) ? s : 0;
+        }
     }
 }

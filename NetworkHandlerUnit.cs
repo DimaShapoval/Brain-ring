@@ -79,6 +79,8 @@ namespace RemoteTriviaCore
 
                     string receivedText = Encoding.UTF8.GetString(result.Buffer);
 
+                    await _udpListener.SendAsync(result.Buffer, result.Buffer.Length, result.RemoteEndPoint);
+
                     MessageReceived?.Invoke(receivedText);
                 }
             }

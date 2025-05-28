@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35931.197 d17.13
+VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteTriviaCore", "RemoteTriviaCore.csproj", "{C9AD344C-E87E-CE89-F3FD-D8365C9DFAE3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteTriviaCore.Tests", "..\RemoteTriviaCore.Tests\RemoteTriviaCore.Tests.csproj", "{8FE71811-C5A1-44B1-80A6-15BE35F08E4D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadTester", "..\LoadTester\LoadTester.csproj", "{30B22FC1-AE72-4D5F-A7CA-DF4927ED37C0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{C9AD344C-E87E-CE89-F3FD-D8365C9DFAE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9AD344C-E87E-CE89-F3FD-D8365C9DFAE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C9AD344C-E87E-CE89-F3FD-D8365C9DFAE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FE71811-C5A1-44B1-80A6-15BE35F08E4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FE71811-C5A1-44B1-80A6-15BE35F08E4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FE71811-C5A1-44B1-80A6-15BE35F08E4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FE71811-C5A1-44B1-80A6-15BE35F08E4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30B22FC1-AE72-4D5F-A7CA-DF4927ED37C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30B22FC1-AE72-4D5F-A7CA-DF4927ED37C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30B22FC1-AE72-4D5F-A7CA-DF4927ED37C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30B22FC1-AE72-4D5F-A7CA-DF4927ED37C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

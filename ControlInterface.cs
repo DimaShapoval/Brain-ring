@@ -1,8 +1,11 @@
 using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using System.Windows.Controls;
+
 
 namespace RemoteTriviaCore
 {
@@ -17,9 +20,12 @@ namespace RemoteTriviaCore
         private readonly DispatcherTimer _mainTimer;
         private readonly DispatcherTimer _bonusTimer;
         private readonly InfoDisplayPanel _infoDisplayPanel;
+        private readonly Label[] _scoreLabels;
+
 
         private int _timeCounter;
         private int _questionIndex;
+
 
         private int? _firstTeamPressed = null;  // ID команди, яка перша натиснула кнопку
 
@@ -39,6 +45,9 @@ namespace RemoteTriviaCore
 
             _receiver.MessageReceived += HandleIncomingMessage;
             _receiver.StartReceiving();
+
+            _scoreLabels = new[] { scoreLabelTeamOne, scoreLabelTeamTwo, scoreLabelTeamThree, scoreLabelTeamFour };
+
 
             InitInterface();
         }
@@ -106,7 +115,7 @@ namespace RemoteTriviaCore
             });
         }
 
-        private void StartRound()
+        internal void StartRound()
         {
             _timeCounter = 0;
             _questionIndex += 1;
@@ -114,15 +123,17 @@ namespace RemoteTriviaCore
             PlaySound("Sounds/Gong.mp3");
             _mainTimer.Start();
             startButton.IsEnabled = false;
+            _firstTeamPressed = null;
         }
 
-        private void ResetGame()
+        internal void ResetGame()
         {
             _mainTimer.Stop();
             _bonusTimer.Stop();
             _timeCounter = 0;
             countdownDisplay.Content = "0";
             startButton.IsEnabled = true;
+            _firstTeamPressed = null;
         }
 
         private void NewGame()
@@ -220,28 +231,52 @@ namespace RemoteTriviaCore
         // Метод для обробки натискання кнопок команд
         private void HandleTeamButtonPress(int teamId)
         {
+            if (teamId < 0 || teamId >= _scoreLabels.Length)
+                return;
+
             if (_firstTeamPressed == null)
             {
-                // Якщо перша команда ще не вибрана, встановлюємо її
                 _firstTeamPressed = teamId;
 
-                // Оновлюємо індикатори
+                _mainTimer.Stop();
+                _bonusTimer.Stop();
+
                 UpdateIndicators(teamId);
 
-                // Показуємо ведучому, яка команда натиснула першою
-                MessageBox.Show($"Перша команда: {GetTeamNameById(teamId)}", "Перша команда", MessageBoxButton.OK, MessageBoxImage.Information);
+                // Питаємо, чи правильно відповіла команда
+                var teamName = GetTeamNameById(teamId);
+                var text = $"Перша команда: {teamName}\nЧи правильно вона відповіла?";
+                var caption = "Результат відповіді";
+                var result = MessageBox.Show(text, caption, MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    // Зараховуємо бал у сесії
+                    _session.AwardPoint(teamId - 1);
+
+                    // Оновлюємо UI-лейбл з рахунком
+                    _scoreLabels[teamId - 1].Content = _session.GetTeamScore(teamId - 1).ToString();
+                    //MessageBox.Show($"{_scoreLabels[teamId].Content}", caption, MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                }
+                else
+                {
+                    _mainTimer.Start();
+                    _firstTeamPressed = null;
+                }
             }
         }
+
 
         // Метод для отримання назви команди за ID
         private string GetTeamNameById(int teamId)
         {
             switch (teamId)
             {
-                case 0: return teamNameInputOne.Text;
-                case 1: return teamNameInputTwo.Text;
-                case 2: return teamNameInputThree.Text;
-                case 3: return teamNameInputFour.Text;
+                case 1: return teamNameInputOne.Text;
+                case 2: return teamNameInputTwo.Text;
+                case 3: return teamNameInputThree.Text;
+                case 4: return teamNameInputFour.Text;
                 default: return "Невідома команда";
             }
         }
